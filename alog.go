@@ -55,14 +55,16 @@ func (al Alog) shutdown() {
 }
 
 // MessageChannel returns a channel that accepts messages that should be written to the log.
-func (al Alog) MessageChannel() chan string {
+// send only
+func (al Alog) MessageChannel() chan<- string {
 	return al.msgCh
 }
 
 // ErrorChannel returns a channel that will be populated when an error is raised during a write operation.
 // This channel should always be monitored in some way to prevent deadlock goroutines from being generated
 // when errors occur.
-func (al Alog) ErrorChannel() chan error {
+// rerceive only
+func (al Alog) ErrorChannel() <-chan error {
 	return al.errorCh
 }
 
