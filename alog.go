@@ -39,7 +39,10 @@ func New(w io.Writer) *Alog {
 // Start begins the message loop for the asynchronous logger. It should be initiated as a goroutine to prevent
 // the caller from being blocked.
 func (al Alog) Start() {
-
+	for {
+		msg := <-al.msgCh
+		go al.write(msg, nil)
+	}
 }
 
 func (al Alog) formatMessage(msg string) string {
@@ -54,11 +57,11 @@ func (al Alog) write(msg string, wg *sync.WaitGroup) {
 	defer al.m.Unlock()
 	_, err := al.dest.Write([]byte(al.formatMessage(msg)))
 	if err != nil {
-		panic("this is error")
-		/*go func(er error) {
+		go func(er error) {
 			al.errorCh <- er
-		}(err)*/
+		}(err)
 	}
+
 }
 
 func (al Alog) shutdown() {
